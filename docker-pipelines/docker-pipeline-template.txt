@@ -2,7 +2,7 @@ pipeline {
 
     environment {  
 
-        registry = "lylio/chatty"  
+        registry = "e.g. lylio/chatty"
 
         registryCredential = 'dockerhub_id'  
 
@@ -18,7 +18,7 @@ pipeline {
 
             steps {  
 
-                git 'https://github.com/Lylio/chatty-services'  
+                git 'e.g. https://github.com/Lylio/chatty-services'
 
             } 
 
@@ -69,11 +69,3 @@ pipeline {
     } 
 
 } 
-
-
-
---------
-
-
-
-https://github.com/Lylio/chatty-services/
