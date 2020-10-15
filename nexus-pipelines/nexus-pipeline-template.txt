@@ -8,7 +8,7 @@ pipeline {
     environment {
         NEXUS_VERSION = "nexus3"
         NEXUS_PROTOCOL = "http"
-        NEXUS_URL = "URL including port"
+        NEXUS_URL = *** "URL INCLUDING PORT" ***
         NEXUS_REPOSITORY = "maven-nexus-repo"
         NEXUS_CREDENTIAL_ID = "nexus-user-credentials"
     }
@@ -16,7 +16,7 @@ pipeline {
         stage("Clone code from VCS") {
             steps {
                 script {
-                    git 'URL including .git suffix';
+                    git *** 'URL INCLUDING .git SUFFIX' ***;
                 }
             }
         }
