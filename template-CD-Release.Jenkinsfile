@@ -6,21 +6,47 @@ pipeline {
         maven "Maven"
     }
     environment {
+        //NEXUS
         NEXUS_VERSION = "nexus3"
         NEXUS_PROTOCOL = "http"
-        NEXUS_URL = "3.250.12.89:8081"
+        NEXUS_URL = "http://http://54.154.221.150:8081/"
         NEXUS_REPOSITORY = "maven-nexus-repo"
         NEXUS_CREDENTIAL_ID = "nexus-user-credentials"
+        //DOCKER
+        registry = "lylio/chatty"
+        registryCredential = 'dockerhub_id'
+        dockerImage = ''
     }
     stages {
-        stage("Clone code from VCS") {
+        stage("Clone code from GitHub") {
             steps {
                 script {
-                    git 'https://github.com/Lylio/emergency-contact-services.git';
+                    git *** 'URL INCLUDING .git SUFFIX' ***;
                 }
             }
         }
-        stage("Maven Build") {
+        stage('Building Docker image') {
+            steps {
+                script {
+                     dockerImage = docker.build registry + ":$BUILD_NUMBER"
+                }
+            }
+        }
+       stage('Deploy Docker image') {
+            steps {
+                script {
+                     docker.withRegistry( '', registryCredential ) {
+                        dockerImage.push()
+                     }
+                }
+            }
+       }
+       stage('Cleaning Docker up') {
+            steps {
+                sh "docker rmi $registry:$BUILD_NUMBER"
+            }
+       }
+       stage("Maven Build") {
             steps {
                 script {
                     sh "mvn package -DskipTests=true"
@@ -63,5 +89,4 @@ pipeline {
             }
         }
     }
-
 }
