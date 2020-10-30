@@ -6,28 +6,54 @@ pipeline {
         maven "Maven"
     }
     environment {
+        //Nexus
         NEXUS_VERSION = "nexus3"
         NEXUS_PROTOCOL = "http"
-        NEXUS_URL = "http://3.250.12.89:8081"
+        NEXUS_URL = "54.154.221.150:8081"
         NEXUS_REPOSITORY = "maven-nexus-repo"
         NEXUS_CREDENTIAL_ID = "nexus-user-credentials"
+        // DockerHub
+        registry = "lylio/chatty"
+        registryCredential = 'dockerhub_id'
+        dockerImage = ''
     }
     stages {
-        stage("Clone code from VCS") {
+        stage("Clone code from GitHub") {
             steps {
                 script {
-                    git *** 'URL INCLUDING .git SUFFIX' ***;
+                    git 'https://github.com/Lylio/chatty-services.git';
                 }
             }
         }
-        stage("Maven Build") {
+        stage('Build Docker image') {
+            steps {
+                script {
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER"
+                }
+            }
+        }
+        stage('Publish image to DockerHub') {
+            steps {
+                script {
+                    docker.withRegistry( '', registryCredential ) {
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+        stage('Docker cleanup') {
+            steps {
+                sh "docker rmi $registry:$BUILD_NUMBER"
+            }
+        }
+        stage("Package Maven project") {
             steps {
                 script {
                     sh "mvn package -DskipTests=true"
                 }
             }
         }
-        stage("Publish to Nexus Repository Manager") {
+        stage("Publish artefacts to Nexus") {
             steps {
                 script {
                     pom = readMavenPom file: "pom.xml";
